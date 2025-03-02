@@ -1,0 +1,8 @@
+# Ignore the old directory structure
+/docker-na-pratica/
+
+# Ignore backup
+/docker-na-pratica-backup/
+
+# Ignore node modules
+node_modules/
