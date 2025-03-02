@@ -1,0 +1,25 @@
+FROM debian:stable-slim AS builder
+RUN apt-get update && apt-get install -y binutils && rm -rf /var/lib/apt/lists/*
+
+RUN echo '.section .rodata\n\
+msg:    .ascii "Hello, World!\\n"\n\
+len = . - msg\n\
+\n\
+.section .text\n\
+.global _start\n\
+\n\
+_start:\n\
+    mov $1, %rax\n\
+    mov $1, %rdi\n\
+    lea msg(%rip), %rsi\n\
+    mov $len, %rdx\n\
+    syscall\n\
+    mov $60, %rax\n\
+    xor %rdi, %rdi\n\
+    syscall' > hello.s && \
+    as -o hello.o hello.s && \
+    ld --gc-sections -s -o app hello.o
+
+FROM scratch
+COPY --from=builder /app /app
+ENTRYPOINT ["/app"]
